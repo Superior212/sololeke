@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import PropertyCard from "../components/PropertyCard";
 import { useState } from "react";
 import { Link } from "react-router-dom";
