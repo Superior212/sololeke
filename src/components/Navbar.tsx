@@ -78,8 +78,8 @@ function Navbar() {
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors",
                   currentPath === item.href
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+                    ? "text-blue-600 underline underline-offset-4"
+                    : "text-gray-600 hover:text-blue-600"
                 )}
                 onClick={() => setIsMenuOpen(false)}>
                 {item.label}

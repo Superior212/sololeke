@@ -1,17 +1,53 @@
+import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import PropertyCard from "../components/PropertyCard";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { FilterModal } from "../components/FilterModal";
 import { properties } from "../lib/Data";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 export default function Properties() {
   const [filters, setFilters] = useState({
     type: "",
-    minPrice: "",
-    maxPrice: "",
+    price: "",
     beds: "",
     baths: "",
   });
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  const filteredProperties = properties.filter((property) => {
+    const matchesSearch =
+      property.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.title.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesType = !filters.beds || property.beds === parseInt(filters.beds);
+    const matchesMinPrice =
+      !filters.price ||
+      parseInt(property.price) >= parseInt(filters.price);
+    const matchesBeds =
+      !filters.beds || property.beds >= parseInt(filters.beds);
+    const matchesBaths =
+      !filters.baths || property.baths >= parseInt(filters.baths);
+
+    return (
+      matchesSearch &&
+      matchesType &&
+      matchesMinPrice &&
+      matchesBeds &&
+      matchesBaths
+    );
+  });
+
+  const handleOpenFilterModal = () => {
+    setIsFilterModalOpen(true);
+  };
+
+  const handleCloseFilterModal = () => {
+    setIsFilterModalOpen(false);
+  };
 
   return (
     <div className="pt-16">
@@ -30,16 +66,20 @@ export default function Properties() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex-grow">
-              <input
+              <Input
                 type="text"
                 placeholder="Search by location or property name..."
-                className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-md border border-gray-300 hover:bg-gray-50">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={handleOpenFilterModal}>
               <SlidersHorizontal className="h-5 w-5" />
               Filters
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -47,13 +87,20 @@ export default function Properties() {
       {/* Property Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties.map((property) => (
+          {filteredProperties.map((property) => (
             <Link key={property.id} to={`/property/${property.id}`}>
               <PropertyCard {...property} />
             </Link>
           ))}
         </div>
       </div>
+
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={handleCloseFilterModal}
+        filters={filters}
+        setFilters={setFilters}
+      />
     </div>
   );
 }
